@@ -1,0 +1,20 @@
+ ordersCSV = LOAD '/user/maria_dev/orders.csv'  
+USING PigStorage(',') 
+
+AS  
+	  (game_id:chararray,   
+	  unit_id:chararray,    
+      unit_order:chararray,   
+      location:chararray,   
+      target:chararray,    
+      target_dest:chararray,   
+      success:chararray,   
+      reason:chararray,   
+      turn_num:chararray);
+      order_by_data = ORDER ordersCSV BY location ASC;
+      filter_data = FILTER order_by_data BY location=='Holland';
+      grouped_data = GROUP filter_data BY (location, target);
+      holland_counts = FOREACH grouped_data GENERATE
+      FLATTEN(group) AS (location, target), 
+      COUNT(filter_data.location);
+      DUMP holland_counts;  
